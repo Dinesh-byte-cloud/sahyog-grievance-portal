@@ -6,8 +6,8 @@ const { createClient } = require('@supabase/supabase-js');
 const fetch = require('node-fetch');
 
 // Initialize Supabase client
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_KEY;
+const supabaseUrl = 'https://mrnqxqzloowrokgggufr.supabase.co';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1ybnF4cXpsb293cm9rZ2dndWZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY0NDM0MDYsImV4cCI6MjA2MjAxOTQwNn0.jnLdc31w8fVpA2SaunyGBd_HCdavHYlWZa4SVKYK0WA';
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 const app = express();
