@@ -1,0 +1,56 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "complaint-received",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "Webhook1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 0]
+    },
+    {
+      "parameters": {
+        "fromEmail": "dineshkandarpa123@gmail.com",
+        "toEmail": "={{$json[\"email\"]}}",
+        "subject": "Complaint Received",
+        "emailFormat": "both",
+        "text": "Dear Citizen,\n\nYour complaint has been successfully registered.\n\nComplaint Details:\n- ID: {{$json.complaintId}}\n- Category: {{$json.category}}\n- Location: {{$json.location}}\n- Description: {{$json.description}}\n\nYou can track your complaint status at:\nhttp://localhost:3000/track-complaint.html?id={{$json.complaintId}}\n\nThank you for using Sahyog.\n\nBest regards,",
+        "options": {}
+      },
+      "id": "SendEmail1",
+      "name": "Send Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2,
+      "position": [500, 0],
+      "credentials": {
+        "smtp": {
+          "id": "KkOHXGE3VR3OvZp1",
+          "name": "SMTP account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook1": {
+      "main": [
+        [
+          {
+            "node": "SendEmail1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "meta": {
+    "instanceId": "your-instance-id"
+  }
+} 

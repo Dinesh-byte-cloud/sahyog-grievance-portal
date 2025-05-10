@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Log Complaint - Sayoog</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a href="index.html" class="text-2xl font-bold text-blue-600">Sahyog</a>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="index.html" class="text-gray-600 hover:text-blue-600">Home</a>
+                    <a href="#" class="text-gray-600 hover:text-blue-600">About</a>
+                    <a href="#" class="text-gray-600 hover:text-blue-600">Contact</a>
+                    <a href="login.html" id="loginNavItem" class="text-gray-600 hover:text-blue-600">Login</a>
+                    <a href="government-dashboard.html" id="dashboardNavItem" class="text-gray-600 hover:text-blue-600" style="display: none;">Dashboard</a>
+                    <a href="#" id="logoutNavItem" class="text-gray-600 hover:text-blue-600" style="display: none;" onclick="logout()">Login</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="bg-white rounded-lg shadow-lg p-8">
+            <h1 class="text-3xl font-bold text-gray-800 mb-8 text-center">Log Your Complaint</h1>
+            
+            <!-- Complaint Details -->
+            <div class="max-w-2xl mx-auto">
+                <div class="bg-gray-50 rounded-lg p-6">
+                    <h2 class="text-xl font-semibold text-gray-800 mb-4">Complaint Details</h2>
+                    
+                    <!-- Status Indicator -->
+                    <div id="status" class="mb-6 p-4 rounded-lg bg-blue-50 text-blue-700">
+                        Ready to record your complaint
+                    </div>
+
+                    <!-- Complaint Form -->
+                    <form id="complaintForm" class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Category</label>
+                            <select id="category" class="form-select" required>
+                                <option value="">Select Category</option>
+                                <optgroup label="Water Supply">
+                                    <option value="water_leakage">Water Pipeline Leakage</option>
+                                    <option value="water_quality">Water Quality Issues</option>
+                                    <option value="water_supply">Irregular Water Supply</option>
+                                    <option value="water_connection">New Water Connection</option>
+                                </optgroup>
+                                <optgroup label="Garbage & Sanitation">
+                                    <option value="garbage_collection">Irregular Garbage Collection</option>
+                                    <option value="garbage_bins">Damaged/Missing Garbage Bins</option>
+                                    <option value="street_cleaning">Street Cleaning Issues</option>
+                                    <option value="public_toilets">Public Toilet Maintenance</option>
+                                </optgroup>
+                                <optgroup label="Drainage">
+                                    <option value="drainage_blockage">Drainage Blockage</option>
+                                    <option value="drainage_overflow">Drainage Overflow</option>
+                                    <option value="drainage_repair">Drainage Repair</option>
+                                    <option value="sewage_issues">Sewage Issues</option>
+                                </optgroup>
+                                <optgroup label="Electricity">
+                                    <option value="power_outage">Power Outage</option>
+                                    <option value="street_lights">Street Light Issues</option>
+                                    <option value="electrical_hazard">Electrical Hazard</option>
+                                    <option value="meter_issues">Meter Related Issues</option>
+                                </optgroup>
+                                <optgroup label="Roads & Infrastructure">
+                                    <option value="potholes">Potholes</option>
+                                    <option value="road_repair">Road Repair</option>
+                                    <option value="street_signs">Damaged/Missing Street Signs</option>
+                                    <option value="sidewalk_issues">Sidewalk Issues</option>
+                                </optgroup>
+                                <optgroup label="Documentation">
+                                    <option value="ration_card">Ration Card Issues</option>
+                                    <option value="aadhaar">Aadhaar Card Issues</option>
+                                    <option value="voter_id">Voter ID Issues</option>
+                                    <option value="birth_certificate">Birth Certificate</option>
+                                    <option value="death_certificate">Death Certificate</option>
+                                    <option value="income_certificate">Income Certificate</option>
+                                    <option value="caste_certificate">Caste Certificate</option>
+                                </optgroup>
+                                <optgroup label="Other Issues">
+                                    <option value="noise_pollution">Noise Pollution</option>
+                                    <option value="air_pollution">Air Pollution</option>
+                                    <option value="park_maintenance">Park Maintenance</option>
+                                    <option value="public_transport">Public Transport Issues</option>
+                                    <option value="other">Other Issues</option>
+                                </optgroup>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Location</label>
+                            <input type="text" id="location" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" placeholder="Enter location">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Description</label>
+                            <textarea id="description" rows="4" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" placeholder="Enter description"></textarea>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Email</label>
+                            <input type="email" id="email" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" placeholder="Enter your email">
+                        </div>
+
+                        <button type="submit" class="w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                            Submit Complaint
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-8 mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center">
+                <p>&copy; 2024 Sahyog. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Check authentication status
+        function checkAuth() {
+            const token = localStorage.getItem('token');
+            const role = localStorage.getItem('role');
+            
+            if (token) {
+                document.getElementById('loginNavItem').style.display = 'none';
+                document.getElementById('logoutNavItem').style.display = 'block';
+                if (role === 'government') {
+                    document.getElementById('dashboardNavItem').style.display = 'block';
+                }
+            }
+        }
+
+        // Logout function
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('role');
+            window.location.href = '/login.html';
+        }
+
+        // Check auth on page load
+        checkAuth();
+
+        // HeyGen API Configuration
+        const HEYGEN_API_KEY = 'ZGY0MzcxZDhjNTZmNDcxMzliZGRiNTBjZDYzYzNiMzctMTc0NjYzMDI5OQ==';
+        const API_BASE_URL = '/api/heygen/v1';
+        let conversationId = null;
+
+        // Form submission handler
+        document.getElementById('complaintForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = {
+                category: document.getElementById('category').value,
+                location: document.getElementById('location').value,
+                description: document.getElementById('description').value,
+                email: document.getElementById('email').value,
+                conversation_id: conversationId
+            };
+
+            try {
+                const response = await fetch('/api/complaints', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    alert('Complaint submitted successfully! Your complaint ID is: ' + data.id);
+                    window.location.href = '/track-complaint.html';
+                } else {
+                    throw new Error('Failed to submit complaint');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Failed to submit complaint. Please try again.');
+            }
+        });
+    </script>
+    <!-- HeyGen Floating Video Bot -->
+    <script>!function(window){const host="https://labs.heygen.com",url=host+"/guest/streaming-embed?share=eyJxdWFsaXR5IjoiaGlnaCIsImF2YXRhck5hbWUiOiJUaGFkZGV1c19Qcm9mZXNzaW9uYWxMb29r%0D%0AMl9wdWJsaWMiLCJwcmV2aWV3SW1nIjoiaHR0cHM6Ly9maWxlczIuaGV5Z2VuLmFpL2F2YXRhci92%0D%0AMy9jMGI1YjhhZWNlZmI0MWUyYmIyNTg5YmE1OGJlZTFhYl81NTk1MC9wcmV2aWV3X3RhbGtfMS53%0D%0AZWJwIiwibmVlZFJlbW92ZUJhY2tncm91bmQiOnRydWUsImtub3dsZWRnZUJhc2VJZCI6IjU1NmZh%0D%0ANmIxYjZkNTQ1OWRiOGQxNDhjOGU5Zjk4ZWEyIiwidXNlcm5hbWUiOiI0MDY1ZWNjNjI4MTE0ODBk%0D%0AOWExMWU5MTc4ZDc1NWVlOCJ9&inIFrame=1",clientWidth=document.body.clientWidth,wrapDiv=document.createElement("div");wrapDiv.id="heygen-streaming-embed";const container=document.createElement("div");container.id="heygen-streaming-container";const stylesheet=document.createElement("style");stylesheet.innerHTML=`\n  #heygen-streaming-embed {\n    z-index: 9999;\n    position: fixed;\n    left: 40px;\n    bottom: 40px;\n    width: 200px;\n    height: 200px;\n    border-radius: 50%;\n    border: 2px solid #fff;\n    box-shadow: 0px 8px 24px 0px rgba(0, 0, 0, 0.12);\n    transition: all linear 0.1s;\n    overflow: hidden;\n\n    opacity: 0;\n    visibility: hidden;\n  }\n  #heygen-streaming-embed.show {\n    opacity: 1;\n    visibility: visible;\n  }\n  #heygen-streaming-embed.expand {\n    ${clientWidth<540?"height: 266px; width: 96%; left: 50%; transform: translateX(-50%);":"height: 366px; width: calc(366px * 16 / 9);"}\n    border: 0;\n    border-radius: 8px;\n  }\n  #heygen-streaming-container {\n    width: 100%;\n    height: 100%;\n  }\n  #heygen-streaming-container iframe {\n    width: 100%;\n    height: 100%;\n    border: 0;\n  }\n  `;const iframe=document.createElement("iframe");iframe.allowFullscreen=!1,iframe.title="Streaming Embed",iframe.role="dialog",iframe.allow="microphone",iframe.src=url;let visible=!1,initial=!1;window.addEventListener("message",(e=>{e.origin===host&&e.data&&e.data.type&&"streaming-embed"===e.data.type&&("init"===e.data.action?(initial=!0,wrapDiv.classList.toggle("show",initial)):"show"===e.data.action?(visible=!0,wrapDiv.classList.toggle("expand",visible)):"hide"===e.data.action&&(visible=!1,wrapDiv.classList.toggle("expand",visible)))})),container.appendChild(iframe),wrapDiv.appendChild(stylesheet),wrapDiv.appendChild(container),document.body.appendChild(wrapDiv)}(globalThis);</script>
+</body>
+</html> 

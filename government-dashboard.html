@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Government Dashboard - Complaint Management</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        .complaint-card {
+            margin-bottom: 20px;
+            transition: transform 0.2s;
+        }
+        .complaint-card:hover {
+            transform: translateY(-5px);
+        }
+        .status-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+        .filters {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="#">Government Dashboard</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <span class="nav-link" id="userEmail"></span>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/login.html">Login</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="filters">
+            <div class="row">
+                <div class="col-md-3">
+                    <select class="form-select" id="statusFilter">
+                        <option value="">All Status</option>
+                        <option value="pending">Pending</option>
+                        <option value="in_progress">In Progress</option>
+                        <option value="resolved">Resolved</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <select class="form-select" id="categoryFilter">
+                        <option value="">All Categories</option>
+                        <option value="infrastructure">Infrastructure</option>
+                        <option value="sanitation">Sanitation</option>
+                        <option value="security">Security</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <input type="text" class="form-control" id="searchInput" placeholder="Search complaints...">
+                </div>
+                <div class="col-md-2">
+                    <button class="btn btn-primary w-100" onclick="loadComplaints()">Apply Filters</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="complaintsList" class="row">
+            <!-- Complaints will be loaded here -->
+        </div>
+    </div>
+
+    <!-- Complaint Details Modal -->
+    <div class="modal fade" id="complaintModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Complaint Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="complaintDetails"></div>
+                    <hr>
+                    <h6>Update Status</h6>
+                    <form id="updateStatusForm">
+                        <input type="hidden" id="complaintId">
+                        <div class="mb-3">
+                            <select class="form-select" id="newStatus" required>
+                                <option value="pending">Pending</option>
+                                <option value="in_progress">In Progress</option>
+                                <option value="resolved">Resolved</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <textarea class="form-control" id="statusNote" placeholder="Add a note about this update" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Update Status</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Check authentication on page load
+        document.addEventListener('DOMContentLoaded', async () => {
+            const token = localStorage.getItem('token');
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+
+            if (!token) {
+                window.location.href = '/login.html';
+                return;
+            }
+
+            // Set user info
+            document.getElementById('userEmail').textContent = user.email;
+
+            // Load initial complaints
+            await loadComplaints();
+
+            // Set up form submission handler
+            document.getElementById('updateStatusForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const complaintId = document.getElementById('complaintId').value;
+                const newStatus = document.getElementById('newStatus').value;
+                const statusNote = document.getElementById('statusNote').value;
+
+                try {
+                    const response = await fetch(`/api/complaints/${complaintId}/status`, {
+                        method: 'PUT',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            status: newStatus,
+                            note: statusNote
+                        })
+                    });
+
+                    if (!response.ok) throw new Error('Failed to update status');
+
+                    bootstrap.Modal.getInstance(document.getElementById('complaintModal')).hide();
+                    loadComplaints();
+                    alert('Status updated successfully');
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('Failed to update status');
+                }
+            });
+        });
+
+        // Load complaints with filters
+        async function loadComplaints() {
+            const token = localStorage.getItem('token');
+            const status = document.getElementById('statusFilter').value;
+            const category = document.getElementById('categoryFilter').value;
+            const search = document.getElementById('searchInput').value;
+
+            try {
+                const queryParams = new URLSearchParams();
+                if (status) queryParams.append('status', status);
+                if (category) queryParams.append('category', category);
+                if (search) queryParams.append('search', search);
+
+                const response = await fetch(`/api/complaints?${queryParams}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) {
+                    if (response.status === 401) {
+                        window.location.href = '/login.html';
+                        return;
+                    }
+                    throw new Error('Failed to fetch complaints');
+                }
+
+                const complaints = await response.json();
+                displayComplaints(complaints);
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Failed to load complaints');
+            }
+        }
+
+        // Display complaints
+        function displayComplaints(complaints) {
+            const container = document.getElementById('complaintsList');
+            container.innerHTML = '';
+
+            complaints.forEach(complaint => {
+                const card = document.createElement('div');
+                card.className = 'col-md-6 col-lg-4';
+                card.innerHTML = `
+                    <div class="card complaint-card">
+                        <div class="card-body">
+                            <span class="badge ${getStatusBadgeClass(complaint.status)} status-badge">
+                                ${complaint.status}
+                            </span>
+                            <h5 class="card-title">${complaint.category}</h5>
+                            <h6 class="card-subtitle mb-2 text-muted">${complaint.location}</h6>
+                            <p class="card-text">${complaint.description.substring(0, 100)}...</p>
+                            <button class="btn btn-primary btn-sm" onclick="showComplaintDetails('${complaint.id}')">
+                                View Details
+                            </button>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // Get status badge class
+        function getStatusBadgeClass(status) {
+            switch (status) {
+                case 'pending': return 'bg-warning';
+                case 'in_progress': return 'bg-info';
+                case 'resolved': return 'bg-success';
+                default: return 'bg-secondary';
+            }
+        }
+
+        // Show complaint details
+        async function showComplaintDetails(complaintId) {
+            const token = localStorage.getItem('token');
+            try {
+                const response = await fetch(`/api/complaints/${complaintId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) throw new Error('Failed to fetch complaint details');
+
+                const complaint = await response.json();
+                document.getElementById('complaintId').value = complaint.id;
+                document.getElementById('newStatus').value = complaint.status;
+                
+                const detailsHtml = `
+                    <div class="mb-3">
+                        <strong>Category:</strong> ${complaint.category}
+                    </div>
+                    <div class="mb-3">
+                        <strong>Location:</strong> ${complaint.location}
+                    </div>
+                    <div class="mb-3">
+                        <strong>Description:</strong> ${complaint.description}
+                    </div>
+                    <div class="mb-3">
+                        <strong>Email:</strong> ${complaint.email}
+                    </div>
+                    <div class="mb-3">
+                        <strong>Timeline:</strong>
+                        <ul class="list-group mt-2">
+                            ${complaint.timeline.map(item => `
+                                <li class="list-group-item">
+                                    <small class="text-muted">${new Date(item.timestamp).toLocaleString()}</small>
+                                    <br>
+                                    <strong>${item.status}</strong>: ${item.description}
+                                </li>
+                            `).join('')}
+                        </ul>
+                    </div>
+                `;
+                
+                document.getElementById('complaintDetails').innerHTML = detailsHtml;
+                new bootstrap.Modal(document.getElementById('complaintModal')).show();
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Failed to load complaint details');
+            }
+        }
+    </script>
+</body>
+</html> 

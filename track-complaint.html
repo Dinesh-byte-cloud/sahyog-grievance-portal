@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Track Complaint - Sayoog</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+        }
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        .status-pending {
+            background-color: #FEF3C7;
+            color: #92400E;
+        }
+        .status-in-progress {
+            background-color: #DBEAFE;
+            color: #1E40AF;
+        }
+        .status-resolved {
+            background-color: #D1FAE5;
+            color: #065F46;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a href="index.html" class="text-2xl font-bold text-blue-600">Sayoog</a>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="index.html" class="text-gray-600 hover:text-blue-600">Home</a>
+                    <a href="#" class="text-gray-600 hover:text-blue-600">About</a>
+                    <a href="#" class="text-gray-600 hover:text-blue-600">Contact</a>
+                    <a href="login.html" id="loginNavItem" class="text-gray-600 hover:text-blue-600">Login</a>
+                    <a href="government-dashboard.html" id="dashboardNavItem" class="text-gray-600 hover:text-blue-600" style="display: none;">Dashboard</a>
+                    <a href="#" id="logoutNavItem" class="text-gray-600 hover:text-blue-600" style="display: none;" onclick="logout()">Logout</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="bg-white rounded-lg shadow-lg p-8">
+            <h1 class="text-3xl font-bold text-gray-800 mb-8 text-center">Track Your Complaint</h1>
+            
+            <!-- Search Form -->
+            <div class="max-w-xl mx-auto mb-8">
+                <form id="searchForm" class="flex gap-4">
+                    <input type="text" id="complaintId" placeholder="Enter Complaint ID" class="flex-1 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                    <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                        Search
+                    </button>
+                </form>
+            </div>
+
+            <!-- Complaint Details -->
+            <div id="complaintDetails" class="hidden">
+                <div class="bg-gray-50 rounded-lg p-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <h2 class="text-xl font-semibold text-gray-800 mb-4">Complaint Information</h2>
+                            <dl class="space-y-4">
+                                <div>
+                                    <dt class="text-sm font-medium text-gray-500">Complaint ID</dt>
+                                    <dd id="complaintIdDisplay" class="mt-1 text-sm text-gray-900"></dd>
+                                </div>
+                                <div>
+                                    <dt class="text-sm font-medium text-gray-500">Category</dt>
+                                    <dd id="categoryDisplay" class="mt-1 text-sm text-gray-900"></dd>
+                                </div>
+                                <div>
+                                    <dt class="text-sm font-medium text-gray-500">Location</dt>
+                                    <dd id="locationDisplay" class="mt-1 text-sm text-gray-900"></dd>
+                                </div>
+                                <div>
+                                    <dt class="text-sm font-medium text-gray-500">Description</dt>
+                                    <dd id="descriptionDisplay" class="mt-1 text-sm text-gray-900"></dd>
+                                </div>
+                            </dl>
+                        </div>
+                        <div>
+                            <h2 class="text-xl font-semibold text-gray-800 mb-4">Status Information</h2>
+                            <dl class="space-y-4">
+                                <div>
+                                    <dt class="text-sm font-medium text-gray-500">Current Status</dt>
+                                    <dd id="statusDisplay" class="mt-1"></dd>
+                                </div>
+                                <div>
+                                    <dt class="text-sm font-medium text-gray-500">Submitted On</dt>
+                                    <dd id="submittedDateDisplay" class="mt-1 text-sm text-gray-900"></dd>
+                                </div>
+                                <div>
+                                    <dt class="text-sm font-medium text-gray-500">Last Updated</dt>
+                                    <dd id="lastUpdatedDisplay" class="mt-1 text-sm text-gray-900"></dd>
+                                </div>
+                            </dl>
+                        </div>
+                    </div>
+
+                    <!-- Status Timeline -->
+                    <div class="mt-8">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">Status Timeline</h3>
+                        <div id="timeline" class="space-y-4">
+                            <!-- Timeline items will be added here dynamically -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- No Results Message -->
+            <div id="noResults" class="hidden text-center py-8">
+                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <h3 class="mt-2 text-sm font-medium text-gray-900">No complaint found</h3>
+                <p class="mt-1 text-sm text-gray-500">Please check the complaint ID and try again.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-8 mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center">
+                <p>&copy; 2024 Sayoog. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Check authentication status
+        function checkAuth() {
+            const token = localStorage.getItem('token');
+            const role = localStorage.getItem('role');
+            
+            if (token) {
+                document.getElementById('loginNavItem').style.display = 'none';
+                document.getElementById('logoutNavItem').style.display = 'block';
+                if (role === 'government') {
+                    document.getElementById('dashboardNavItem').style.display = 'block';
+                }
+            }
+        }
+
+        // Logout function
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('role');
+            window.location.href = '/login.html';
+        }
+
+        // Check auth on page load
+        checkAuth();
+
+        // Form submission handler
+        document.getElementById('searchForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const complaintId = document.getElementById('complaintId').value;
+            
+            try {
+                const response = await fetch(`/api/complaints/${complaintId}`);
+                if (!response.ok) {
+                    throw new Error('Complaint not found');
+                }
+
+                const complaint = await response.json();
+                displayComplaintDetails(complaint);
+            } catch (error) {
+                showNoResults();
+                console.error('Error:', error);
+            }
+        });
+
+        // Display complaint details
+        function displayComplaintDetails(complaint) {
+            document.getElementById('complaintDetails').classList.remove('hidden');
+            document.getElementById('noResults').classList.add('hidden');
+
+            // Update complaint information
+            document.getElementById('complaintIdDisplay').textContent = complaint.id;
+            document.getElementById('categoryDisplay').textContent = complaint.category;
+            document.getElementById('locationDisplay').textContent = complaint.location;
+            document.getElementById('descriptionDisplay').textContent = complaint.description;
+            
+            // Update status information
+            const statusBadge = createStatusBadge(complaint.status);
+            document.getElementById('statusDisplay').innerHTML = statusBadge;
+            document.getElementById('submittedDateDisplay').textContent = formatDate(complaint.submittedAt);
+            document.getElementById('lastUpdatedDisplay').textContent = formatDate(complaint.updatedAt);
+
+            // Update timeline
+            updateTimeline(complaint.timeline);
+        }
+
+        // Create status badge
+        function createStatusBadge(status) {
+            const statusClasses = {
+                'pending': 'status-pending',
+                'in-progress': 'status-in-progress',
+                'resolved': 'status-resolved'
+            };
+
+            return `<span class="status-badge ${statusClasses[status]}">${status}</span>`;
+        }
+
+        // Format date
+        function formatDate(dateString) {
+            return new Date(dateString).toLocaleString();
+        }
+
+        // Update timeline
+        function updateTimeline(timeline) {
+            const timelineContainer = document.getElementById('timeline');
+            timelineContainer.innerHTML = '';
+
+            timeline.forEach(item => {
+                const timelineItem = document.createElement('div');
+                timelineItem.className = 'flex items-start';
+                timelineItem.innerHTML = `
+                    <div class="flex-shrink-0">
+                        <div class="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center">
+                            <svg class="h-5 w-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-900">${item.status}</p>
+                        <p class="text-sm text-gray-500">${item.description}</p>
+                        <p class="text-xs text-gray-400">${formatDate(item.timestamp)}</p>
+                    </div>
+                `;
+                timelineContainer.appendChild(timelineItem);
+            });
+        }
+
+        // Show no results message
+        function showNoResults() {
+            document.getElementById('complaintDetails').classList.add('hidden');
+            document.getElementById('noResults').classList.remove('hidden');
+        }
+
+        // Check for complaint ID in URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const complaintId = urlParams.get('id');
+        if (complaintId) {
+            document.getElementById('complaintId').value = complaintId;
+            document.getElementById('searchForm').dispatchEvent(new Event('submit'));
+        }
+    </script>
+</body>
+</html> 
